@@ -1,4 +1,7 @@
 const kafka = require("./client");
+const EventEmitter = require("events")
+
+const eventEmitter = new EventEmitter();
 
 async function Consume() {
     const consumer = kafka.consumer({ groupId: "consumer-1" });
@@ -16,6 +19,7 @@ async function Consume() {
         await consumer.run({
             eachMessage: async ({ topic, partition, message, heartbeat, pause }) => {
                 console.log(`[${topic}]/[PART:${partition}]:${message.value.toString()}`);
+                eventEmitter.emit('message', `[${topic}]/[PART:${partition}]:${message.value.toString()}`);
             },
         })
 
@@ -28,4 +32,5 @@ async function Consume() {
     }
 }
 
-Consume();
+// Consume();
+module.exports = { Consume, eventEmitter }
