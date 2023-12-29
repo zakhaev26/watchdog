@@ -5,7 +5,7 @@ option go_package = "github.com/zakhaev26/WatchDog";
 message Book {
     int32 Id = 1;
     string Title = 2;
-    Author Author = 3;
+    repeated Author Authors = 3;
     Category Category = 4;   
 }
 

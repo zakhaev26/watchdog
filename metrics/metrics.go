@@ -1,4 +1,4 @@
-package metrics
+package main
 
 import (
 	"fmt"
@@ -50,5 +50,9 @@ func LogCPUUsage() {
 			fmt.Print(logEntry)
 		}
 	}
+}
+
+func main() {
+	LogCPUUsage()
 }
 
