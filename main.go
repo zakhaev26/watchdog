@@ -1,51 +1,66 @@
 package main
 
 import (
-	"fmt"
-	"log"
+	"encoding/json"
+	"sync"
 	"time"
 
-	"github.com/shirou/gopsutil/host"
+	"github.com/sirupsen/logrus"
+	"github.com/zakhaev26/WatchDog/processor"
+	"github.com/zakhaev26/WatchDog/producer"
 )
 
 func main() {
-	infoStat, err := host.Info()
+	logrus.SetFormatter(&logrus.JSONFormatter{})
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		for {
+			AvgCpuUsage := processor.FetchCpuUsage()
 
-	var platformFamily string = infoStat.PlatformFamily
-	fmt.Println(platformFamily)
+			if AvgCpuUsage > 80.0 {
+				logEntry := logrus.WithFields(logrus.Fields{
+					"cpu_usage": AvgCpuUsage,
+				})
 
-	var hostID string = infoStat.HostID
-	fmt.Println(hostID)
+				logEntry.Info("Critical event detected")
 
-	var bootTime uint64 = infoStat.BootTime
-	fmt.Println(bootTime)
+				// Convert log entry fields to JSON
+				jsonFields, err := json.Marshal(logEntry.Data)
+				if err != nil {
+					logEntry.WithError(err).Error("Failed to serialize log entry fields")
+					continue
+				}
 
-	var kernelArch string = infoStat.KernelArch
-	fmt.Println(kernelArch)
+				err = producer.PushToKafka("WDCriticalLogs", jsonFields)
 
-	var procs uint64 = infoStat.Procs
-	fmt.Println(procs)
+				if err != nil {
+					logEntry.WithError(err).Error("Failed to produce to Kafka")
+				} else {
+					logEntry.Info("Produced in WDCriticalLogs!")
+				}
+			}
+		}
+	}()
 
-	var upTime string = formatUptime(infoStat.Uptime)
+	go func() {
+		defer wg.Done()
+		for {
 
-	fmt.Println(upTime)
+			data := processor.CpuUsageEachSecond()
+			err := producer.PushToKafka("WDDailyLogs", []byte(data))
 
-	var vRole string = infoStat.VirtualizationRole
-	fmt.Println(vRole)
+			if err != nil {
+				logrus.WithError(err).Error("Failed to produce to Kafka")
+			} else {
+				logrus.Info("Produced in WDDailyLogs!")
+			}
 
-	var pmVersion string = infoStat.PlatformVersion
-	fmt.Println(pmVersion)
+			time.Sleep(time.Second)
+		}
+	}()
 
-	var vSys string = infoStat.VirtualizationSystem
-	fmt.Println(vSys)
-
-}
-
-func formatUptime(uptime uint64) string {
-	duration := time.Duration(uptime) * time.Second
-	return duration.String()
+	wg.Wait()
 }

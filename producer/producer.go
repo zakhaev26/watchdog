@@ -1,20 +1,10 @@
-package main
+package producer
 
 import (
 	"fmt"
 
 	"github.com/IBM/sarama"
 )
-
-func main() {
-	msg := []byte("SKG hu m!")
-	err := PushToKafka("nandini", msg)
-
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println("Produced!")
-}
 
 func ConnectProducer(brokersUrl []string) (sarama.SyncProducer, error) {
 

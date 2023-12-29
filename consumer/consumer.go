@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/IBM/sarama"
 )
 
-func main() {
-
-	topic := "nandini"
+func Consumer(topic string) {
 	worker, err := connectConsumer([]string{"localhost:9092"})
 	if err != nil {
 		panic(err)
@@ -51,7 +50,6 @@ func main() {
 	if err := worker.Close(); err != nil {
 		panic(err)
 	}
-
 }
 
 func connectConsumer(brokersUrl []string) (sarama.Consumer, error) {
@@ -65,4 +63,22 @@ func connectConsumer(brokersUrl []string) (sarama.Consumer, error) {
 	}
 
 	return conn, nil
+}
+
+func main() {
+
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		defer wg.Done()
+		Consumer("WDDailyLogs")
+	}()
+
+	go func() {
+		defer wg.Done()
+		Consumer("WDCriticalLogs")
+	}()
+
+	wg.Wait()
 }
