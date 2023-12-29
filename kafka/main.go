@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	msg := []byte("SKG!")
+	msg := []byte("SKG hu m!")
 	err := PushToKafka("nandini", msg)
 
 	if err != nil {
