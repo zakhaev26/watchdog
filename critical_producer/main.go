@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"time"
+
+	"github.com/joho/godotenv"
 
 	processor "github.com/zakhaev26/critical_producer/cpu"
 	kafkaProducer "github.com/zakhaev26/critical_producer/kafka"
@@ -16,6 +19,15 @@ func main() {
 }
 
 func CriticalLog() {
+
+	err := godotenv.Load()
+
+	if err != nil {
+		fmt.Println("Error loading .env")
+		return
+	}
+	CRITICAL_LOG_NODE_ID := os.Getenv("CRITICAL_LOG_NODE_ID")
+
 	thresholdMin := 5
 	incidentCount := 0
 	for {
@@ -25,7 +37,7 @@ func CriticalLog() {
 			incidentCount++
 
 			logMessage := "Critical event detected - CPU Usage: " + strconv.FormatFloat(AvgCpuUsage, 'f', 2, 64)
-			kafkaProducer.PushToKafka("watchdog-critical-logs", logMessage)
+			kafkaProducer.PushToKafka(CRITICAL_LOG_NODE_ID, logMessage)
 
 			content := `<!DOCTYPE html>
 						<html lang="en">

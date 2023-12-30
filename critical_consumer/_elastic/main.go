@@ -8,12 +8,23 @@ import (
 	"strconv"
 	"syscall"
 
+	"github.com/joho/godotenv"
 	"github.com/zakhaev26/elastic/consumer"
 )
 
 func main() {
+	err := godotenv.Load()
 
-	consumer, worker := consumer.Consumer("watchdog-critical-logs")
+	if err != nil {
+		fmt.Println("Error loading .env")
+		return
+	}
+
+	CRITICAL_LOG_NODE_ID := os.Getenv("CRITICAL_LOG_NODE_ID")
+	ES_HOST := os.Getenv("ES_HOST")
+	ES_API_KEY := os.Getenv("ES_API_KEY")
+
+	consumer, worker := consumer.Consumer(CRITICAL_LOG_NODE_ID)
 
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
@@ -29,7 +40,7 @@ func main() {
 			case msg := <-consumer.Messages():
 				msgCount++
 				fmt.Printf("%s\n", (msg.Value))
-				message := `{ "index" : { "_index" : "nuakhai", "_id" : "` + strconv.Itoa(msgCount) + `" } }` +
+				message := `{ "index" : { "_index" : "` + CRITICAL_LOG_NODE_ID + `", "_id" : "` + strconv.Itoa(msgCount) + `" } }` +
 					`
 {"` + string(msg.Value) + `":` + `null}` +
 					`
@@ -43,19 +54,19 @@ func main() {
 				bashScript := []byte(
 					`curl -XPOST -i -k \
 					-H "Content-Type: application/x-ndjson" \
-					-H "Authorization: ApiKey YnRQMnVZd0JiVGNVQXhUR2hsVGo6QjJRNndEQ2dSTHVmVjdtNGx1OV9GQQ==" \
-					https://watchdog.es.asia-south1.gcp.elastic-cloud.com/_bulk --data-binary "@reqs"; echo      
+					-H "Authorization: ApiKey ` + ES_API_KEY + `" \` +
+						ES_HOST + ` --data-binary "@reqs"; echo      
 					`)
 
 				// Save the Bash script to a file
-				err = os.WriteFile("myscript.sh", bashScript, 0755)
+				err = os.WriteFile("critical.sh", bashScript, 0755)
 				if err != nil {
 					fmt.Println("Error creating Bash script:", err)
 					return
 				}
 
 				// Run the Bash script using the "sh" command
-				cmd := exec.Command("sh", "myscript.sh")
+				cmd := exec.Command("sh", "critical.sh")
 
 				// Redirect standard output and error to the console
 				cmd.Stdout = os.Stdout

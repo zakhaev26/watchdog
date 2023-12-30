@@ -13,7 +13,7 @@ func Consumer(topic string) (sarama.PartitionConsumer,sarama.Consumer) {
 		panic(err)
 	}
 
-	// and share it for all partitions that live on it.
+	// consumer shares worker for for all partitions that live on it.
 	consumer, err := worker.ConsumePartition(topic, 0, sarama.OffsetNewest)
 	if err != nil {
 		panic(err)
