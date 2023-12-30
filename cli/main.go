@@ -56,6 +56,7 @@ func initialModel() model {
 			t.Focus()
 			t.PromptStyle = focusedStyle
 			t.TextStyle = focusedStyle
+			t.CharLimit = 190
 		case 1:
 			t.Placeholder = "Enter Kibana API Key"
 			t.CharLimit = 64

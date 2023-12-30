@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -40,27 +41,27 @@ func main() {
 				fmt.Println(err)
 			case msg := <-consumer.Messages():
 				msgCount++
-				fmt.Printf("%s\n", (msg.Value))
-				message := `{ "index" : { "_index" : "gudiapokhari", "_id" : "` + strconv.Itoa(msgCount) + `" } }` +
+				message := `{ "index" : { "_index" : "` + FREQUENT_LOG_NODE_ID + `", "_id" : "` + strconv.Itoa(msgCount) + `" } }` +
 					`
 {"` + string(msg.Value) + `":` + `null}` +
 					`
 
 `
-				err := os.WriteFile("reqs", []byte(message), 0755)
+				err := ioutil.WriteFile("reqs", []byte(message), 0755)
 				if err != nil {
 					fmt.Println("Error creating reqs:", err)
 				}
-
 				bashScript := []byte(
 					`curl -XPOST -i -k \
-					-H "Content-Type: application/x-ndjson" \
-					-H "Authorization: ApiKey ` + ES_API_KEY + `" \` +
-						ES_HOST + ` --data-binary "@reqs"; echo      
+-H "Content-Type: application/x-ndjson" \
+-H "Authorization: ApiKey ` + ES_API_KEY + `" \` +
+						ES_HOST + `/_bulk --data-binary "@reqs"; echo      
 					`)
 
 				// Save the Bash script to a file
-				err = os.WriteFile("myscript.sh", bashScript, 0755)
+				err = ioutil.WriteFile("myscript.sh", bashScript, 0755)
+				fmt.Println("OOGA BOOGA")
+
 				if err != nil {
 					fmt.Println("Error creating Bash script:", err)
 					return
@@ -77,7 +78,6 @@ func main() {
 				err = cmd.Run()
 				if err != nil {
 					fmt.Println("Error running Bash script:", err)
-					return
 				}
 			case <-sigchan:
 				fmt.Println("Interrupt is detected")

@@ -55,7 +55,7 @@ func main() {
 					`curl -XPOST -i -k \
 					-H "Content-Type: application/x-ndjson" \
 					-H "Authorization: ApiKey ` + ES_API_KEY + `" \` +
-						ES_HOST + ` --data-binary "@reqs"; echo      
+						ES_HOST + `/_bulk --data-binary "@reqs"; echo      
 					`)
 
 				// Save the Bash script to a file
