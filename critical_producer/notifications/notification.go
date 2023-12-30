@@ -1,4 +1,4 @@
-package mailing
+package mailer
 
 import (
 	"bytes"

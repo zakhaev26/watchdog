@@ -1,4 +1,4 @@
-package producer
+package kafkaProducer
 
 import (
 	"fmt"
@@ -21,7 +21,7 @@ func ConnectProducer(brokersUrl []string) (sarama.SyncProducer, error) {
 	return conn, nil
 }
 
-func PushToKafka(topic string, message []byte) error {
+func PushToKafka(topic string, message string) error {
 
 	brokersUrl := []string{"localhost:9092"}
 	producer, err := ConnectProducer(brokersUrl)
@@ -36,12 +36,12 @@ func PushToKafka(topic string, message []byte) error {
 		Value: sarama.StringEncoder(message),
 	}
 
-	partition, offset, err := producer.SendMessage(msg)
+	_, _, err = producer.SendMessage(msg)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Message is stored in topic(%s)/partition(%d)/offset(%d)\n", topic, partition, offset)
+	fmt.Printf("Message Produced!\n")
 
 	return nil
 }

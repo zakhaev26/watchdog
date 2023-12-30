@@ -1,0 +1,8 @@
+go 1.21.4
+
+use (
+	./critical_producer
+	./frequent_consumer/_elastic
+	./frequent_producer
+	./mail_service
+)
