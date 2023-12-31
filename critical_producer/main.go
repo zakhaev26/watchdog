@@ -28,15 +28,15 @@ func CriticalLog() {
 	}
 	CRITICAL_LOG_NODE_ID := os.Getenv("CRITICAL_LOG_NODE_ID")
 
-	thresholdMin := 5
+	// thresholdMin := 5
 	incidentCount := 0
 	for {
-		AvgCpuUsage := processor.FetchCpuUsage()
-
+		AvgCpuUsage, time_ := processor.FetchCpuUsage()
+		data := strconv.FormatFloat(float64(AvgCpuUsage), 'f', -1, 64)
 		if AvgCpuUsage < 80.0 {
 			incidentCount++
 
-			logMessage := "Critical event detected - CPU Usage: " + strconv.FormatFloat(AvgCpuUsage, 'f', 2, 64)
+			logMessage := data + " " + time_
 			kafkaProducer.PushToKafka(CRITICAL_LOG_NODE_ID, logMessage)
 
 			content := `<!DOCTYPE html>
@@ -111,7 +111,7 @@ func CriticalLog() {
 			`
 
 			_ = mailer.SendMail(string(content), "Cpu OverClocking - Watchdog Metrics", "b422056@iiit-bh.ac.in")
-			time.Sleep(time.Minute * time.Duration(thresholdMin))
+			time.Sleep(5*time.Second)
 		} else {
 			continue
 		}

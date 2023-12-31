@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 
 	"github.com/joho/godotenv"
@@ -41,12 +42,15 @@ func main() {
 				fmt.Println(err)
 			case msg := <-consumer.Messages():
 				msgCount++
-				message := `{ "index" : { "_index" : "` + FREQUENT_LOG_NODE_ID + `", "_id" : "` + strconv.Itoa(msgCount) + `" } }` +
-					`
-{"` + string(msg.Value) + `":` + `null}` +
-					`
+				var stat string = string(msg.Value)
+				parts := strings.Split(stat, " ")
 
-`
+				cpuUsage, _ := strconv.ParseFloat(parts[0], 64)
+				timeValue := parts[1]
+				message := `{ "index" : { "_index" : "` + FREQUENT_LOG_NODE_ID + `", "_id" : "` + strconv.Itoa(msgCount) + `" } }
+				{"cpu_usage": ` + strconv.FormatFloat(cpuUsage, 'f', -1, 64) + `, "time": "` + timeValue + `"}` + "\n"
+
+				fmt.Println("UH:",message)
 				err := ioutil.WriteFile("reqs", []byte(message), 0755)
 				if err != nil {
 					fmt.Println("Error creating reqs:", err)

@@ -34,7 +34,7 @@ func FetchCpuUsage() float64 {
 	return averageCPUUsage
 }
 
-func CpuUsageEachSecond() string {
+func CpuUsageEachSecond() (string,string) {
 
 	interval := time.Second
 
@@ -45,6 +45,5 @@ func CpuUsageEachSecond() string {
 
 	cpuUsage := cpuPercentages[0]
 	data := strconv.FormatFloat(float64(cpuUsage), 'f', -1, 64)
-	var res string = "CPU USAGE:" + data + " | TIME:" + time.Now().String()
-	return res
+	return data,time.Now().Format("15:04:05")
 }

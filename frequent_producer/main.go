@@ -21,8 +21,9 @@ func main() {
 	FREQUENT_LOG_NODE_ID := os.Getenv("FREQUENT_LOG_NODE_ID")
 
 	for {
-		data := processor.CpuUsageEachSecond()
-		err := kafkaProducer.PushToKafka(FREQUENT_LOG_NODE_ID, data)
+		data, time_ := processor.CpuUsageEachSecond()
+		fString := data + " " + time_
+		err := kafkaProducer.PushToKafka(FREQUENT_LOG_NODE_ID, fString)
 
 		if err != nil {
 			fmt.Println(err)

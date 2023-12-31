@@ -10,7 +10,7 @@ import (
 
 var cpuDetails []cpu.InfoStat
 
-func FetchCpuUsage() float64 {
+func FetchCpuUsage() (float64, string) {
 
 	duration := 2 * time.Second
 	interval := time.Second
@@ -31,7 +31,7 @@ func FetchCpuUsage() float64 {
 
 	// Calculate average CPU usage
 	averageCPUUsage := totalCPUUsage / float64(numSamples)
-	return averageCPUUsage
+	return averageCPUUsage, time.Now().Format("15:04:05")
 }
 
 func CpuUsageEachSecond() string {

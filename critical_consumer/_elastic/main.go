@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"os/signal"
 	"strconv"
+	"strings"
 	"syscall"
 
 	"github.com/joho/godotenv"
@@ -39,13 +40,15 @@ func main() {
 				fmt.Println(err)
 			case msg := <-consumer.Messages():
 				msgCount++
-				fmt.Printf("%s\n", (msg.Value))
-				message := `{ "index" : { "_index" : "` + CRITICAL_LOG_NODE_ID + `", "_id" : "` + strconv.Itoa(msgCount) + `" } }` +
-					`
-{"` + string(msg.Value) + `":` + `null}` +
-					`
+				var stat string = string(msg.Value)
+				parts := strings.Split(stat, " ")
 
-`
+				cpuUsage, _ := strconv.ParseFloat(parts[0], 64)
+				timeValue := parts[1]
+				message := `{ "index" : { "_index" : "` + CRITICAL_LOG_NODE_ID + `", "_id" : "` + strconv.Itoa(msgCount) + `" } }
+{"cpu_usage": ` + strconv.FormatFloat(cpuUsage, 'f', -1, 64) + `, "time": "` + timeValue + `"}` + "\n"
+
+				fmt.Println("UH:", message)
 				err := os.WriteFile("reqs", []byte(message), 0755)
 				if err != nil {
 					fmt.Println("Error creating reqs:", err)
@@ -55,7 +58,7 @@ func main() {
 					`curl -XPOST -i -k \
 					-H "Content-Type: application/x-ndjson" \
 					-H "Authorization: ApiKey ` + ES_API_KEY + `" \` +
-						ES_HOST + `/_bulk --data-binary "@reqs"; echo      
+						ES_HOST + `/_bulk	 --data-binary "@reqs"; echo      
 					`)
 
 				// Save the Bash script to a file
