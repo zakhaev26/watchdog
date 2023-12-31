@@ -2,7 +2,7 @@
 
 # WatchDog - Server Monitoring Tool
 
-<img style="width:200px;margin-bottom:20px" src="./image.png" />
+<img style="width:200px;margin-bottom:20px" src="./asset/image.png" />
 
 <img src="https://skillicons.dev/icons?i=go,kafka,docker,bash" />
 </center>
