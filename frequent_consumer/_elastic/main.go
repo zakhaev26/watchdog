@@ -7,10 +7,11 @@ import (
 	"os/exec"
 	"os/signal"
 	"strconv"
-	"strings"
 	"syscall"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/joho/godotenv"
+	"github.com/zakhaev26/critical_producer/protobuf"
 	"github.com/zakhaev26/elastic/consumer"
 )
 
@@ -42,29 +43,30 @@ func main() {
 				fmt.Println(err)
 			case msg := <-consumer.Messages():
 				msgCount++
-				var stat string = string(msg.Value)
-				parts := strings.Split(stat, " ")
+				var stat []byte = msg.Value
+				var val protobuf.KibanaMessage
+				proto.Unmarshal(stat, &val)
 
-				cpuUsage, _ := strconv.ParseFloat(parts[0], 64)
-				timeValue := parts[1]
+				cpuUsage := val.CpuUsage
+				timeValue := val.Time
+				timestamp := val.Timestamp
+
 				message := `{ "index" : { "_index" : "` + FREQUENT_LOG_NODE_ID + `", "_id" : "` + strconv.Itoa(msgCount) + `" } }
-				{"cpu_usage": ` + strconv.FormatFloat(cpuUsage, 'f', -1, 64) + `, "time": "` + timeValue + `"}` + "\n"
-
-				fmt.Println("UH:",message)
+{"cpu_usage": ` + strconv.FormatFloat(cpuUsage, 'f', -1, 64) + `, "time": "` + timeValue + `", "timestamp": "` + timestamp + `" }` + "\n"
+				
 				err := ioutil.WriteFile("reqs", []byte(message), 0755)
 				if err != nil {
 					fmt.Println("Error creating reqs:", err)
 				}
 				bashScript := []byte(
 					`curl -XPOST -i -k \
--H "Content-Type: application/x-ndjson" \
--H "Authorization: ApiKey ` + ES_API_KEY + `" \` +
-						ES_HOST + `/_bulk --data-binary "@reqs"; echo      
-					`)
+				-H "Content-Type: application/x-ndjson" \
+				-H "Authorization: ApiKey ` + ES_API_KEY + `" \` +
+						ES_HOST + `/_bulk --data-binary "@reqs"; echo
+									`)
 
 				// Save the Bash script to a file
 				err = ioutil.WriteFile("myscript.sh", bashScript, 0755)
-				fmt.Println("OOGA BOOGA")
 
 				if err != nil {
 					fmt.Println("Error creating Bash script:", err)

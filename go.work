@@ -1,9 +1,11 @@
 go 1.21.4
 
 use (
+	./cli
+	./critical_consumer/_elastic
 	./critical_producer
 	./frequent_consumer/_elastic
 	./frequent_producer
 	./mail_service
-	./cli
+	./protobuf
 )

@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
 
 	"github.com/joho/godotenv"
-
 	processor "github.com/zakhaev26/critical_producer/cpu"
 	kafkaProducer "github.com/zakhaev26/critical_producer/kafka"
 	mailer "github.com/zakhaev26/critical_producer/notifications"
+	"github.com/zakhaev26/critical_producer/protobuf"
+	"google.golang.org/protobuf/proto"
 )
 
 func main() {
@@ -32,12 +34,22 @@ func CriticalLog() {
 	incidentCount := 0
 	for {
 		AvgCpuUsage, time_ := processor.FetchCpuUsage()
-		data := strconv.FormatFloat(float64(AvgCpuUsage), 'f', -1, 64)
 		if AvgCpuUsage < 80.0 {
 			incidentCount++
 
-			logMessage := data + " " + time_
-			kafkaProducer.PushToKafka(CRITICAL_LOG_NODE_ID, logMessage)
+			msg := &protobuf.KibanaMessage{
+				CpuUsage:  AvgCpuUsage,
+				Time:      time_,
+				Timestamp: time.Now().Format(time.RFC3339),
+			}
+
+			data, err := proto.Marshal(msg)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			kafkaProducer.PushToKafka(CRITICAL_LOG_NODE_ID, string(data))
 
 			content := `<!DOCTYPE html>
 						<html lang="en">
@@ -111,7 +123,7 @@ func CriticalLog() {
 			`
 
 			_ = mailer.SendMail(string(content), "Cpu OverClocking - Watchdog Metrics", "b422056@iiit-bh.ac.in")
-			time.Sleep(5*time.Second)
+			time.Sleep(5 * time.Second)
 		} else {
 			continue
 		}

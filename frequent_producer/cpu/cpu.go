@@ -2,7 +2,6 @@ package processor
 
 import (
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/shirou/gopsutil/cpu"
@@ -34,7 +33,7 @@ func FetchCpuUsage() float64 {
 	return averageCPUUsage
 }
 
-func CpuUsageEachSecond() (string,string) {
+func CpuUsageEachSecond() (float64, string) {
 
 	interval := time.Second
 
@@ -44,6 +43,5 @@ func CpuUsageEachSecond() (string,string) {
 	}
 
 	cpuUsage := cpuPercentages[0]
-	data := strconv.FormatFloat(float64(cpuUsage), 'f', -1, 64)
-	return data,time.Now().Format("15:04:05")
+	return cpuUsage, time.Now().Format("15:04:05")
 }
