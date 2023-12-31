@@ -1,9 +1,20 @@
+<center>
+
 # WatchDog - Server Monitoring Tool
 <img src="./asset/image.png" />
 
+<img src="https://skillicons.dev/icons?i=go,kafka,docker,bash" />
+</center>
+
+<center>
+
 ## Overview
 
-WatchDog is a fault-tolerant server monitoring tool designed to empower server administrators with real-time insights into server health and performance. Its core functionality includes continuous CPU health log collection at one-second intervals. These logs are transferred to Elastic Cloud, where administrators can leverage Kibana for in-depth analytics and visualization of server loads. WatchDog also monitor's cpu health and usage and has a triggering mechanism that promptly notifies administrators via mails when server loads exceed predefined threshold values, ensuring proactive management of system performance.
+
+
+WatchDog is a fault-tolerant server monitoring tool for server administrators with real-time insights into server health and performance. Its core functionality includes continuous CPU health log collection at one-second intervals. These logs are transferred to Elastic Cloud, where administrators can leverage Kibana for in-depth analytics and visualization of server loads. WatchDog also monitor's cpu health and usage and has a triggering mechanism that promptly notifies administrators via mails when server loads exceed predefined threshold values, ensuring proactive management of system performance.
+
+</center>
 
 ## Features
 
@@ -125,14 +136,3 @@ chmod +x watchdog-console-runner.sh
 The watchdog-console-runner.sh script orchestrates the execution of WatchDog microservices in the background.  These programs represent different components of WatchDog, such as frequent and critical consumers and producers.
 
 By running the watchdog-console-runner.sh script, you initiate the WatchDog monitoring components, providing a way to set up the system for continuous monitoring.
-
-<!-- 
-## Comparison with Other Services
-
-WatchDog stands out with its one-second interval log collection and seamless integration with Elastic Cloud. This allows for real-time analytics and visualization, providing a competitive edge over services like Prometheus. Additionally, WatchDog's alerting mechanism ensures proactive system management, distinguishing it as a comprehensive solution for server monitoring.
-Apache Kafka and Elastic Search
-
-WatchDog leverages Apache Kafka for efficient log transmission and Elastic Search for advanced analytics. Kafka facilitates scalable and fault-tolerant log streaming, while Elastic Search powers in-depth analysis and visualization through Kibana, making WatchDog a powerful and versatile server monitoring tool.
-Conclusion
-
-WatchDog is an tool for server administrators, offering a    approach to server monitoring with continuous log collection, seamless integration with Elastic Cloud, and a robust alerting mechanism. Its architecture, utilizing Apache Kafka and Elastic Search, ensures scalability and efficiency in monitoring server health and performance. -->
