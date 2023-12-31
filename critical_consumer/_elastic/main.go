@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/zakhaev26/elastic/consumer"
@@ -45,8 +46,10 @@ func main() {
 
 				cpuUsage, _ := strconv.ParseFloat(parts[0], 64)
 				timeValue := parts[1]
+				var timestamp string = time.Now().Format(time.RFC3339)
+
 				message := `{ "index" : { "_index" : "` + CRITICAL_LOG_NODE_ID + `", "_id" : "` + strconv.Itoa(msgCount) + `" } }
-{"cpu_usage": ` + strconv.FormatFloat(cpuUsage, 'f', -1, 64) + `, "time": "` + timeValue + `"}` + "\n"
+{"cpu_usage": ` + strconv.FormatFloat(cpuUsage, 'f', -1, 64) + `, "time": "` + timeValue + `", "timestamp": "`+timestamp + `" }` + "\n"
 
 				fmt.Println("UH:", message)
 				err := os.WriteFile("reqs", []byte(message), 0755)
