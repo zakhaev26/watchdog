@@ -1,7 +1,8 @@
 <center>
 
 # WatchDog - Server Monitoring Tool
-<img src="./asset/image.png" />
+
+<img style="width:200px;margin-bottom:20px" src="./image.png" />
 
 <img src="https://skillicons.dev/icons?i=go,kafka,docker,bash" />
 </center>
@@ -9,7 +10,6 @@
 <center>
 
 ## Overview
-
 
 
 WatchDog is a fault-tolerant server monitoring tool for server administrators with real-time insights into server health and performance. Its core functionality includes continuous CPU health log collection at one-second intervals. These logs are transferred to Elastic Cloud, where administrators can leverage Kibana for in-depth analytics and visualization of server loads. WatchDog also monitor's cpu health and usage and has a triggering mechanism that promptly notifies administrators via mails when server loads exceed predefined threshold values, ensuring proactive management of system performance.
