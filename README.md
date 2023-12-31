@@ -1,6 +1,6 @@
 <center>
 
-# WatchDog - Server Monitoring Tool
+# WatchDog - A fault tolerant Server Monitoring Tool
 <img src="./asset/image.png" />
 
 <img src="https://skillicons.dev/icons?i=go,kafka,docker,bash" />
