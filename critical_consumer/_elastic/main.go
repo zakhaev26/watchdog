@@ -6,17 +6,16 @@ import (
 	"os/exec"
 	"os/signal"
 	"strconv"
-	"strings"
 	"syscall"
-	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/zakhaev26/critical_consumer/protobuf"
 	"github.com/zakhaev26/elastic/consumer"
+	"google.golang.org/protobuf/proto"
 )
 
 func main() {
 	err := godotenv.Load()
-
 	if err != nil {
 		fmt.Println("Error loading .env")
 		return
@@ -41,15 +40,17 @@ func main() {
 				fmt.Println(err)
 			case msg := <-consumer.Messages():
 				msgCount++
-				var stat string = string(msg.Value)
-				parts := strings.Split(stat, " ")
 
-				cpuUsage, _ := strconv.ParseFloat(parts[0], 64)
-				timeValue := parts[1]
-				var timestamp string = time.Now().Format(time.RFC3339)
+				var stat []byte = msg.Value
+				var val protobuf.KibanaMessage
+				proto.Unmarshal(stat, &val)
+
+				cpuUsage := val.CpuUsage
+				timeValue := val.Time
+				timestamp := val.Timestamp
 
 				message := `{ "index" : { "_index" : "` + CRITICAL_LOG_NODE_ID + `", "_id" : "` + strconv.Itoa(msgCount) + `" } }
-{"cpu_usage": ` + strconv.FormatFloat(cpuUsage, 'f', -1, 64) + `, "time": "` + timeValue + `", "timestamp": "`+timestamp + `" }` + "\n"
+{"cpu_usage": ` + strconv.FormatFloat(cpuUsage, 'f', -1, 64) + `, "time": "` + timeValue + `", "timestamp": "` + timestamp + `" }` + "\n"
 
 				fmt.Println("UH:", message)
 				err := os.WriteFile("reqs", []byte(message), 0755)
