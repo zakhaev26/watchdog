@@ -34,7 +34,7 @@ func CriticalLog() {
 	incidentCount := 0
 	for {
 		AvgCpuUsage, time_ := processor.FetchCpuUsage()
-		if AvgCpuUsage < 80.0 {
+		if AvgCpuUsage > 80.0 {
 			incidentCount++
 
 			msg := &protobuf.KibanaMessage{

@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-option go_package = "github.com/protozakhaev26/model";
-
-message kibanaMessage {
-  double cpu_usage = 1;
-  string time = 2;
-  string timestamp = 3;
-}

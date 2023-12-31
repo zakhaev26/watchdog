@@ -7,5 +7,4 @@ use (
 	./frequent_consumer/_elastic
 	./frequent_producer
 	./mail_service
-	./protobuf
 )
