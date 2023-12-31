@@ -32,7 +32,6 @@ type model struct {
 	CRITICAL_LOG_NODE_ID  string
 	FREQUENT_LOG_NODE_ID  string
 	MAILING_ID            string
-	EMAIL_SENDER_NAME     string
 	EMAIL_SENDER_ADDRESS  string
 	EMAIL_SENDER_PASSWORD string
 }
@@ -41,7 +40,7 @@ var k model
 
 func initialModel() model {
 	m := model{
-		inputs: make([]textinput.Model, 8),
+		inputs: make([]textinput.Model, 7),
 	}
 
 	var t textinput.Model
@@ -78,14 +77,10 @@ func initialModel() model {
 			t.PromptStyle = focusedStyle
 			t.TextStyle = focusedStyle
 		case 5:
-			t.Placeholder = "Enter the SMTP Email Sender Name (Gmail)"
-			t.PromptStyle = focusedStyle
-			t.TextStyle = focusedStyle
-		case 6:
 			t.Placeholder = "Enter the SMTP Email Address (Gmail)"
 			t.PromptStyle = focusedStyle
 			t.TextStyle = focusedStyle
-		case 7:
+		case 6:
 			t.Placeholder = "Enter the SMTP Email Sender Password (Gmail)"
 			t.PromptStyle = focusedStyle
 			t.TextStyle = focusedStyle
@@ -132,9 +127,8 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				k.CRITICAL_LOG_NODE_ID = m.inputs[2].Value()
 				k.FREQUENT_LOG_NODE_ID = m.inputs[3].Value()
 				k.MAILING_ID = m.inputs[4].Value()
-				k.EMAIL_SENDER_NAME = m.inputs[5].Value()
-				k.EMAIL_SENDER_ADDRESS = m.inputs[6].Value()
-				k.EMAIL_SENDER_PASSWORD = m.inputs[7].Value()
+				k.EMAIL_SENDER_ADDRESS = m.inputs[5].Value()
+				k.EMAIL_SENDER_PASSWORD = m.inputs[6].Value()
 
 				return m, tea.Quit
 			}
@@ -213,6 +207,8 @@ func (m model) View() string {
 }
 
 func main() {
+	fmt.Print("Welcome to WatchDog Setup CLI.This Will help you set up your Watchdog Monitor.\n")
+	fmt.Print("Enter Details for Settip up environment Variables.\n")
 	m := initialModel()
 	p := tea.NewProgram(m)
 
@@ -222,7 +218,7 @@ func main() {
 	}
 
 	// Access the values from the model after the program has exited
-	mail_service_env := `EMAIL_SENDER_NAME=` + k.EMAIL_SENDER_NAME +
+	mail_service_env := `EMAIL_SENDER_NAME=WatchDog` +
 		`
 EMAIL_SENDER_ADDRESS=` + k.EMAIL_SENDER_ADDRESS +
 		`

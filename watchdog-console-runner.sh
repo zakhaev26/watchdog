@@ -1,6 +1,7 @@
 #!/bin/bash
 
-echo "Firing 4 threads."
+echo "Starting Watchdog Monitoring,Please be patient as it may take some time"
+echo "Starting takes up to 4 threads."
 
 # Run frequent_consumer in the background
 (cd frequent_consumer/_elastic && go run main.go) &
@@ -13,7 +14,6 @@ echo "Firing 4 threads."
 
 # Run frequent_producer in the background
 (cd frequent_producer && go run main.go) &
-
 
 # Wait for both processes to finish
 wait
